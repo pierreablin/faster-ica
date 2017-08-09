@@ -15,7 +15,7 @@ from __future__ import print_function
 import numpy as np
 from time import time
 
-from tools import loss, gradient, compute_h, score, score_der
+from ..tools import loss, gradient, compute_h, score, score_der
 
 
 def invert_z(h, G):

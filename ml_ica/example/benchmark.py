@@ -3,9 +3,9 @@ from scipy.io import loadmat
 from copy import copy
 import matplotlib.pyplot as plt
 
-from tools import whitening, callback
-from algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
-                        trust_region_ica)
+from .tools import whitening, callback
+from ..algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
+                         trust_region_ica)
 
 
 '''
