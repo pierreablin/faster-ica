@@ -5,11 +5,10 @@ This repository hosts several second order algorithms to solve maximum likelihoo
 
 The algorithms can be found in ``/algorithms``. They are:
 
-* **Picard** (Preconditioned ICA for Real Data): A preconditioned L-BFGS algorithm. The fastest algorithm of the repository.
-* Simple Quasi-Newton method.
-* Relative Trust region method.
-* Truncated Newton method.
-
+* **Picard** (Preconditioned ICA for Real Data): A preconditioned L-BFGS algorithm. The fastest algorithm in the repository.
+* `Simple Quasi-Newton method <https://ie.technion.ac.il/~mcib/newt_ica_ica2003.pdf>`_.
+* `Relative Trust region method <https://pdfs.semanticscholar.org/7f78/929ebd3e7f53d3597adda117a80bbd0f852a.pdf>`_.
+* `Truncated Newton method <http://ieeexplore.ieee.org/document/7952614/>`_.
 
 These algorithms have all been rewritten in Python. They call the same gradient, Hessian and likelihood functions, which makes time comparison meaningful.
 
