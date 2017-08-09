@@ -76,4 +76,4 @@ if __name__ == '__main__':
     S = rng.laplace(size=(N, T))
     A = rng.randn(N, N)
     X = np.dot(A, S)
-    elementary_ica(X, verbose=True)
+    simple_quasi_newton_ica(X, verbose=True)

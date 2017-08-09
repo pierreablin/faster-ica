@@ -13,7 +13,7 @@ from time import time
 
 def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
            ls_tries=10, verbose=0, callback=None):
-    '''Runs L-BFGS ICA algorithm using preconditioning
+    '''Runs Picard algorithm.
 
     The algorithm is detailed in::
 

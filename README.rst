@@ -14,6 +14,17 @@ These algorithms have all been rewritten in Python. They call the same gradient,
 
 The algorithms come with a benchmark at ``example/benchmark.py``. This script runs each algorithm on the same real dataset (fMRI or EEG) and times it.
 
+Installation
+------------
+
+Clone the repository::
+
+  $ git clone https://github.com/pierreablin/faster-ica.git
+
+The easiest way to get started is to run the benchmark:
+
+
+  $ ipython example/benchmark.py
 
 Dependencies
 ------------
