@@ -3,9 +3,9 @@ from scipy.io import loadmat
 from copy import copy
 import matplotlib.pyplot as plt
 
-from .tools import whitening, callback
+from ..tools import whitening, callback
 from ..algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
-                         trust_region_ica)
+                          trust_region_ica)
 
 
 '''
@@ -20,7 +20,7 @@ Fetch dataset
 '''
 
 rng = np.random.randn(0)
-filename = 'example/' + dataset + '.mat'
+filename = 'ml_ica/example/' + dataset + '.mat'
 X = loadmat(filename)['X']
 '''
 Preprocess the signals

@@ -3,7 +3,7 @@ Faster ICA by preconditioning with Hessian approximations
 
 This repository hosts several second order algorithms to solve maximum likelihood ICA.
 
-The algorithms can be found in ``/algorithms``. They are:
+The algorithms can be found in ``ml_ica/algorithms``. They are:
 
 * **Picard** (Preconditioned ICA for Real Data): A preconditioned L-BFGS algorithm. The fastest algorithm in the repository.
 * `Simple Quasi-Newton method <https://ie.technion.ac.il/~mcib/newt_ica_ica2003.pdf>`_.
@@ -12,7 +12,7 @@ The algorithms can be found in ``/algorithms``. They are:
 
 These algorithms have all been rewritten in Python. They call the same gradient, Hessian and likelihood functions, which makes time comparison meaningful.
 
-The algorithms come with a benchmark at ``example/benchmark.py``. This script runs each algorithm on the same real dataset (fMRI or EEG) and times it.
+The algorithms come with a benchmark at ``ml_ica/example/benchmark.py``. This script runs each algorithm on the same real dataset (fMRI or EEG) and times it.
 
 Installation
 ------------
@@ -24,7 +24,7 @@ Clone the repository::
 The easiest way to get started is to run the benchmark::
 
 
-  $ ipython example/benchmark.py
+  $ python -m ml_ica.example.benchmark
 
 Dependencies
 ------------
@@ -35,6 +35,7 @@ These are the dependencies to run the algorithms:
 * matplotlib (>=1.3)
 * numexpr (>= 2.0)
 * scipy (>=0.19)
+
 Cite
 ----
 
