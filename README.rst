@@ -28,8 +28,7 @@ These are the dependencies to run the algorithms:
 Cite
 ----
 
-If you use this code in your project, please cite::
+If you use this code in your project, please cite `this paper <https://arxiv.org/abs/1706.08171>`_::
 
     Pierre Ablin, Jean-Francois Cardoso, and Alexandre Gramfort
     Faster ICA by preconditioning with Hessian approximations
-    https://arxiv.org/abs/1706.08171
