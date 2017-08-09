@@ -142,6 +142,8 @@ def _line_search(Y, W, direction, current_loss, ls_tries, verbose):
     N = Y.shape[0]
     projected_W = np.dot(direction, W)
     alpha = 1.
+    if current_loss is None:
+        current_loss = _loss(Y, W)
     for _ in range(ls_tries):
         Y_new = np.dot(np.eye(N) + alpha * direction, Y)
         W_new = W + alpha * projected_W
