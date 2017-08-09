@@ -6,12 +6,12 @@ This repository hosts several second order algorithms to solve maximum likelihoo
 The algorithms can be found in ``/algorithms``. They are:
 
 * **Picard** (Preconditioned ICA for Real Data): A preconditioned L-BFGS algorithm. The fastest algorithm of the repository.
-* Simple Quasi-Newton method
-* Relative Trust region method
-* Truncated Newton method
+* Simple Quasi-Newton method.
+* Relative Trust region method.
+* Truncated Newton method.
 
 
-These algorithms have all been rewritten in Python. They all call the same gradient, Hessian and likelihood functions, which makes time comparison meaningful.
+These algorithms have all been rewritten in Python. They call the same gradient, Hessian and likelihood functions, which makes time comparison meaningful.
 
 The algorithms come with a benchmark at ``example/benchmark.py``. This script runs each algorithm on the same real dataset (fMRI or EEG) and times it.
 
