@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import setuptools import find_packages
+from setuptools import find_packages
 from numpy.distutils.core import setup
 
 descr = """Maximum likelihood algorithms"""
