@@ -1,5 +1,7 @@
-from .algorithms import * # noqa
-from .example import * # noqa
-from .tools import * # noqa
+from .algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
+                         trust_region_ica)
 
-__all__ = algorithms.__all__ + example.__all__ + tools.__all__  # noqa
+__all__ = ['picard',
+           'simple_quasi_newton_ica',
+           'truncated_ica',
+           'trust_region_ica']

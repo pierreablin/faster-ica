@@ -1,5 +1,5 @@
 #! /usr/bin/env python
-import setuptools  # noqa; we are using a setuptools namespace
+import setuptools import find_packages
 from numpy.distutils.core import setup
 
 descr = """Maximum likelihood algorithms"""
@@ -34,5 +34,5 @@ if __name__ == "__main__":
               'Operating System :: MacOS',
           ],
           platforms='any',
-          packages=['ml_ica'],
+          packages=find_packages(),
           )
