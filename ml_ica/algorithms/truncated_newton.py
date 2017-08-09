@@ -16,8 +16,8 @@ from itertools import product
 import scipy.sparse as sparse
 import scipy.sparse.linalg as slinalg
 
-from tools import (loss, gradient, compute_h, regularize_h, solveh,
-                   hessian_free, score, score_der, linesearch)
+from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
+                     hessian_free, score, score_der, linesearch)
 
 
 def full_hessian(Y, psidY):

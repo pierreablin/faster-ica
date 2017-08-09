@@ -1,5 +1,5 @@
 import numpy as np
-from derivatives import loss
+from .derivatives import loss
 
 
 def linesearch(Y, W, direction, initial_loss=None, n_ls_tries=5):

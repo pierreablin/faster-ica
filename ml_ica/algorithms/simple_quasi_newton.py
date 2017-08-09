@@ -14,8 +14,8 @@ from __future__ import print_function
 import numpy as np
 from time import time
 
-from tools import (loss, gradient, compute_h, regularize_h, solveh,
-                   score, score_der, linesearch)
+from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
+                     score, score_der, linesearch)
 
 
 def simple_quasi_newton_ica(X, maxiter=200, tol=1e-7, precon=2,
