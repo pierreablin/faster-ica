@@ -35,9 +35,6 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=[
-              'picard',
-              'simple_quasi_newton_ica',
-              'truncated_newton',
-              'trust_region'
+              'algorithms'
           ],
           )
