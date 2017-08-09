@@ -21,7 +21,7 @@ Clone the repository::
 
   $ git clone https://github.com/pierreablin/faster-ica.git
 
-The easiest way to get started is to run the benchmark:
+The easiest way to get started is to run the benchmark::
 
 
   $ ipython example/benchmark.py
