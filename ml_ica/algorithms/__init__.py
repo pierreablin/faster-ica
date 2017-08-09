@@ -17,3 +17,8 @@ from picard import picard
 from simple_quasi_newton import simple_quasi_newton_ica
 from trust_region import trust_region_ica
 from truncated_newton import truncated_ica
+
+__all__ = ['picard',
+           'simple_quasi_newton_ica',
+           'trust_region_ica',
+           'truncated_ica']

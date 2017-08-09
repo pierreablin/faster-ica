@@ -35,6 +35,6 @@ if __name__ == "__main__":
           ],
           platforms='any',
           packages=[
-              'algorithms'
+              'ml_ica'
           ],
           )
