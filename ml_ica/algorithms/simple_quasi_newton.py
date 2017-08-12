@@ -11,8 +11,8 @@ M. Zibulevsky, "Blind source separation with relative newton method"
 # License: BSD (3-clause)
 
 from __future__ import print_function
-import numpy as np
 from time import time
+import numpy as np
 
 from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
                      score, score_der, linesearch)
@@ -25,6 +25,8 @@ def simple_quasi_newton_ica(X, maxiter=200, tol=1e-7, precon=2,
     Highly inspired by:
 
     M. Zibulevsky, "Blind source separation with relative newton method"
+
+    XXX params not documented
     '''
     Y = X.copy()
     N, T = Y.shape

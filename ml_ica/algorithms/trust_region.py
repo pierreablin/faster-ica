@@ -12,8 +12,8 @@ H. Choi and S. Choi
 # License: BSD (3-clause)
 
 from __future__ import print_function
-import numpy as np
 from time import time
+import numpy as np
 
 from ..tools import loss, gradient, compute_h, score, score_der
 
@@ -125,7 +125,7 @@ def trust_region_ica(X, maxiter=200, tol=1e-7, lambda_min=0.01, verbose=0,
         else:
             predred = -inner(G, direction)
             predred -= 0.5 * inner(direction, direction * H2 + direction.T)
-        RR = actred/(predred + eps)
+        RR = actred / (predred + eps)
         update = False
         if RR > RTT:
             update = True

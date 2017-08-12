@@ -1,38 +1,40 @@
+import os
+
 import numpy as np
 from scipy.io import loadmat
-from copy import copy
 import matplotlib.pyplot as plt
 
-from ..tools import whitening, callback
-from ..algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
-                          trust_region_ica)
+from ml_ica.tools import whitening, callback
+from ml_ica.algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
+                               trust_region_ica)
 
 
 '''
 Choose dataset
 '''
-
 dataset = 'eeg'
 # dataset = 'fmri'
 
 '''
 Fetch dataset
 '''
-
-rng = np.random.randn(0)
-filename = 'ml_ica/example/' + dataset + '.mat'
+rng = np.random.RandomState(0)
+filename = os.path.join(os.path.dirname(__file__), dataset + '.mat')
 X = loadmat(filename)['X']
+
 '''
 Preprocess the signals
 '''
 X -= np.mean(X, axis=1, keepdims=True)
 X, _ = whitening(X)
-N, T = X.shape
+n_features, n_samples = X.shape
+
 '''
 Specify the tolerance and maximum number of iterations
 '''
 tol = 1e-7
 maxiter = 250
+# XXX : maxiter should be max_iter
 
 '''
 Run each algorithm on the dataset and plot the gradient curves
@@ -47,11 +49,11 @@ print('''
 
 Running ica on %s dataset of size %d x %d...
 
-''' % (dataset, N, T))
+''' % (dataset, n_features, n_samples))
 
 for algorithm, name in zip(algorithm_list, algorithm_names):
     cb = callback(['timing', 'gradient_norm'])
-    X_copy = copy(X)
+    X_copy = X.copy()
     print('Running  %s ...' % name)
     algorithm(X_copy, verbose=1, callback=cb, tol=tol, maxiter=maxiter)
     gradients = cb['gradient_norm']
@@ -61,6 +63,7 @@ for algorithm, name in zip(algorithm_list, algorithm_names):
     print('Average time per iteration: %.2g sec' % (times[-1] / len(times)))
     plt.semilogy(times, gradients, label=name)
     print('')
+
 plt.legend()
 plt.xlabel('Time (sec)')
 plt.ylabel('Gradient norm')

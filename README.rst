@@ -1,5 +1,5 @@
 Faster ICA by preconditioning with Hessian approximations
-==========
+=========================================================
 
 This repository hosts several second order algorithms to solve maximum likelihood ICA.
 
@@ -20,11 +20,13 @@ Installation
 Clone the repository::
 
   $ git clone https://github.com/pierreablin/faster-ica.git
+  $ cd faster-ica
+  $ pip install -e .
 
 The easiest way to get started is to run the benchmark::
 
 
-  $ python -m ml_ica.example.benchmark
+  $ python examples/benchmark.py
 
 Dependencies
 ------------
