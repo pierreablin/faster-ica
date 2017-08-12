@@ -26,7 +26,7 @@ Clone the repository::
 The easiest way to get started is to run the benchmark::
 
 
-  $ python -m examples/benchmark.py
+  $ python examples/benchmark.py
 
 Dependencies
 ------------
