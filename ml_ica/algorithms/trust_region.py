@@ -14,6 +14,7 @@ H. Choi and S. Choi
 from __future__ import print_function
 from time import time
 import numpy as np
+from scipy import linalg
 
 from ..tools import loss, gradient, compute_h, score, score_der
 
@@ -53,7 +54,7 @@ def norm(A):
     return np.sqrt(inner(A, A))
 
 
-def trust_region_ica(X, maxiter=200, tol=1e-7, lambda_min=0.01, verbose=0,
+def trust_region_ica(X, max_iter=200, tol=1e-7, lambda_min=0.01, verbose=0,
                      callback=None):
     '''
     Trust region method for ICA.
@@ -61,6 +62,34 @@ def trust_region_ica(X, maxiter=200, tol=1e-7, lambda_min=0.01, verbose=0,
 
     H. Choi and S. Choi
     "A relative trust-region algorithm for independent component analysis"
+    Parameters
+    ----------
+    X : array, shape (N, T)
+        Matrix containing the signals that have to be unmixed. N is the
+        number of signals, T is the number of samples. X has to be centered
+
+    max_iter : int
+        Maximal number of iterations for the algorithm
+
+    tol : float
+        tolerance for the stopping criterion. Iterations stop when the norm
+        of the gradient gets smaller than tol.
+
+    lambda_min : float
+        Constant used to regularize the Hessian approximations. The
+        eigenvalues of the approximation that are below lambda_min are
+        shifted to lambda_min.
+
+    verbose : 0, 1 or 2
+        Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    Returns
+    -------
+    Y : array, shape (N, T)
+        The estimated source matrix
+
+    W : array, shape (N, N)
+        The estimated unmixing matrix, such that Y = WX
     '''
     eps = 1e-15
     N, T = X.shape
@@ -71,12 +100,12 @@ def trust_region_ica(X, maxiter=200, tol=1e-7, lambda_min=0.01, verbose=0,
     Y = X.copy()
     objective = loss(Y, W)
     t0 = time()
-    for n in range(maxiter):
+    for n in range(max_iter):
         timing = time() - t0
         psiY = score(Y)
         psidY = score_der(psiY)
         G = gradient(Y, psiY)
-        gradient_norm = np.max(np.abs(G))
+        gradient_norm = linalg.norm(G.ravel(), ord=np.inf)
         if gradient_norm < tol or delta < 1e-10:
             break
         H2 = compute_h(Y, psidY) - np.eye(N)

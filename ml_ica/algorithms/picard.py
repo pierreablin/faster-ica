@@ -13,7 +13,7 @@ from scipy import linalg
 import numexpr as ne
 
 
-def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
+def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
            ls_tries=10, verbose=0, callback=None):
     '''Runs Picard algorithm.
 
@@ -33,7 +33,7 @@ def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
     m : int
         Size of L-BFGS's memory. Typical values for m are in the range 3-15
 
-    maxiter : int
+    max_iter : int
         Maximal number of iterations for the algorithm
 
     precon : 1 or 2
@@ -77,7 +77,7 @@ def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
     r_list = []
     current_loss = None
     t0 = time()
-    for n in range(maxiter):
+    for n in range(max_iter):
         timing = time() - t0
         # Compute the score function
         psiY = ne.evaluate('tanh(Y / 2.)')

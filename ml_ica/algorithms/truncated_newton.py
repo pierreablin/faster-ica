@@ -14,6 +14,7 @@ from time import time
 from itertools import product
 import numpy as np
 import scipy.sparse as sparse
+from scipy import linalg
 import scipy.sparse.linalg as slinalg
 
 from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
@@ -87,12 +88,45 @@ def conjugate_gradient(Y, psidY, h, G, lambda_reg, n_cg_it, tol):
     return x
 
 
-def truncated_ica(X, tol=1e-7, maxiter=100, l_fact=2., cg_tol=1e-2,
+def truncated_ica(X, tol=1e-7, max_iter=100, l_fact=2., cg_tol=1e-2,
                   verbose=0, callback=None, cg_max=300):
     '''
     Main algorithm.
     The smallest eigenvalue of the Hessian is explecitly computed, but that
     duration is not taken into account.
+
+    Parameters
+    ----------
+    X : array, shape (N, T)
+        Matrix containing the signals that have to be unmixed. N is the
+        number of signals, T is the number of samples. X has to be centered
+
+    tol : float
+        tolerance for the stopping criterion. Iterations stop when the norm
+        of the gradient gets smaller than tol.
+
+    max_iter : int
+        Maximal number of iterations for the algorithm
+
+    l_fact : float
+        Used to regularize the full Hessian. Its eigen values are shiffted by
+        l_fact * its smallest eigenvalue
+
+    cg_tol : float
+        Conjugate gradient stoping tolerance.
+
+    verbose : 0, 1 or 2
+        Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    cg_max : float
+        Maximum number of inner conjugate gradient iterations
+    Returns
+    -------
+    Y : array, shape (N, T)
+        The estimated source matrix
+
+    W : array, shape (N, N)
+        The estimated unmixing matrix, such that Y = WX.
     '''
     N, T = X.shape
     Y = X.copy()
@@ -101,14 +135,14 @@ def truncated_ica(X, tol=1e-7, maxiter=100, l_fact=2., cg_tol=1e-2,
     t0 = time()
     timing = 0.
     t_cheats = 0.
-    for n in range(maxiter):
+    for n in range(max_iter):
         # Compute the score and its derivative
         psiY = score(Y)
         psidY = score_der(psiY)
         # Compute the gradient
         G = gradient(Y, psiY)
         # Stopping criterion
-        gradient_norm = np.max(np.abs(G))
+        gradient_norm = linalg.norm(G.ravel(), ord=np.inf)
         if callback is not None:
             callback(locals())
         if gradient_norm < tol:
@@ -152,4 +186,4 @@ if __name__ == '__main__':
     S = rng.laplace(size=(N, T))
     A = rng.randn(N, N)
     X = np.dot(A, S)
-    truncated_ica(X, verbose=True, maxiter=100)
+    truncated_ica(X, verbose=True, max_iter=100)

@@ -13,12 +13,13 @@ M. Zibulevsky, "Blind source separation with relative newton method"
 from __future__ import print_function
 from time import time
 import numpy as np
+from scipy import linalg
 
 from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
                      score, score_der, linesearch)
 
 
-def simple_quasi_newton_ica(X, maxiter=200, tol=1e-7, precon=2,
+def simple_quasi_newton_ica(X, max_iter=200, tol=1e-7, precon=2,
                             lambda_min=0.01, verbose=0, callback=None):
     '''
     Simple quasi-Newton algorithm.
@@ -26,14 +27,48 @@ def simple_quasi_newton_ica(X, maxiter=200, tol=1e-7, precon=2,
 
     M. Zibulevsky, "Blind source separation with relative newton method"
 
-    XXX params not documented
+    Parameters
+    ----------
+    X : array, shape (N, T)
+        Matrix containing the signals that have to be unmixed. N is the
+        number of signals, T is the number of samples. X has to be centered
+
+    max_iter : int
+        Maximal number of iterations for the algorithm
+
+    tol : float
+        tolerance for the stopping criterion. Iterations stop when the norm
+        of the gradient gets smaller than tol.
+
+    precon : 1 or 2
+        Chooses which Hessian approximation is used.
+        1 -> H1
+        2 -> H2
+        H2 is more costly to compute but can greatly accelerate convergence
+        (See the paper for details).
+
+    lambda_min : float
+        Constant used to regularize the Hessian approximations. The
+        eigenvalues of the approximation that are below lambda_min are
+        shifted to lambda_min.
+
+    verbose : 0, 1 or 2
+        Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    Returns
+    -------
+    Y : array, shape (N, T)
+        The estimated source matrix
+
+    W : array, shape (N, N)
+        The estimated unmixing matrix, such that Y = WX.
     '''
     Y = X.copy()
     N, T = Y.shape
     W = np.eye(N)
     current_loss = loss(Y, W)
     t0 = time()
-    for n in range(maxiter):
+    for n in range(max_iter):
         timing = time() - t0
         # Compute the score and its derivative
         psiY = score(Y)
@@ -41,7 +76,7 @@ def simple_quasi_newton_ica(X, maxiter=200, tol=1e-7, precon=2,
         # Compute gradient
         G = gradient(Y, psiY)
         # Stopping criterion
-        gradient_norm = np.max(np.abs(G))
+        gradient_norm = linalg.norm(G.ravel(), ord=np.inf)
         if gradient_norm < tol:
             break
         # Compute the approximation

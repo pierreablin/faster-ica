@@ -33,8 +33,7 @@ n_features, n_samples = X.shape
 Specify the tolerance and maximum number of iterations
 '''
 tol = 1e-7
-maxiter = 250
-# XXX : maxiter should be max_iter
+max_iter = 250
 
 '''
 Run each algorithm on the dataset and plot the gradient curves
@@ -55,7 +54,7 @@ for algorithm, name in zip(algorithm_list, algorithm_names):
     cb = callback(['timing', 'gradient_norm'])
     X_copy = X.copy()
     print('Running  %s ...' % name)
-    algorithm(X_copy, verbose=1, callback=cb, tol=tol, maxiter=maxiter)
+    algorithm(X_copy, verbose=1, callback=cb, tol=tol, max_iter=max_iter)
     gradients = cb['gradient_norm']
     times = cb['timing']
     print('Took %.2g s / %d iterations to reach a gradient norm of %.2g.' %
