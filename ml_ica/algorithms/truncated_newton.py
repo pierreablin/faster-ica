@@ -10,9 +10,9 @@ Tillet, P. et al., "Infomax-ICA using Hessian-free optimization"
 #
 # License: BSD (3-clause)
 from __future__ import print_function
-import numpy as np
 from time import time
 from itertools import product
+import numpy as np
 import scipy.sparse as sparse
 import scipy.sparse.linalg as slinalg
 

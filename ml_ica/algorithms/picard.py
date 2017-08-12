@@ -5,10 +5,12 @@
 # License: BSD (3-clause)
 
 from __future__ import print_function
-from copy import copy
-import numpy as np
-import numexpr as ne
+
 from time import time
+
+import numpy as np
+from scipy import linalg
+import numexpr as ne
 
 
 def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
@@ -69,7 +71,7 @@ def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
     # Init
     N, T = X.shape
     W = np.eye(N)
-    Y = copy(X)
+    Y = X.copy()
     s_list = []
     y_list = []
     r_list = []
@@ -80,10 +82,12 @@ def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
         # Compute the score function
         psiY = ne.evaluate('tanh(Y / 2.)')
         psidY = ne.evaluate('(- psiY ** 2 + 1.) / 2.')  # noqa
+        # XXX why don't you use score and score_der functions here?
         # Compute the relative gradient
-        G = np.inner(psiY, Y) / float(T) - np.eye(N)
+        G = np.inner(psiY, Y) / float(T)
+        G.flat[::N + 1] -= 1  # remove 1 from diagonal
         # Stopping criterion
-        gradient_norm = np.max(np.abs(G))
+        gradient_norm = linalg.norm(G.ravel(), ord=np.inf)
         if gradient_norm < tol:
             break
         # Update the memory
@@ -91,7 +95,7 @@ def picard(X, m=7, maxiter=1000, precon=1, tol=1e-7, lambda_min=0.01,
             s_list.append(direction) # noqa
             y = G - G_old  # noqa
             y_list.append(y)
-            r_list.append(1. / (np.sum(direction * y)))  # noqa
+            r_list.append(1. / np.dot(direction.ravel(), y.ravel()))  # noqa
             if len(s_list) > m:
                 s_list.pop(0)
                 y_list.pop(0)
@@ -129,7 +133,7 @@ def _loss(Y, W):
     Computes the loss function for Y, W
     '''
     T = Y.shape[1]
-    log_det = np.linalg.slogdet(W)[1]
+    _, log_det = np.linalg.slogdet(W)
     logcoshY = np.sum(ne.evaluate('abs(Y) + 2. * log1p(exp(-abs(Y)))'))
     return - log_det + logcoshY / float(T)
 
@@ -158,7 +162,7 @@ def _line_search(Y, W, direction, current_loss, ls_tries, verbose):
 
 
 def _l_bfgs_direction(G, h, s_list, y_list, r_list, precon, lambda_min):
-    q = copy(G)
+    q = G.copy()
     a_list = []
     for s, y, r in zip(reversed(s_list), reversed(y_list), reversed(r_list)):
         alpha = r * np.sum(s * q)
@@ -215,8 +219,9 @@ def _solve_hessian(G, h):
 if __name__ == '__main__':
     # Generate Laplace signals and a mixing matrix
     N, T = 3, 100000
-    S = np.random.laplace(size=(N, T))
-    A = np.random.randn(N, N)
+    rng = np.random.RandomState(1)
+    S = rng.laplace(size=(N, T))
+    A = rng.randn(N, N)
     # Generate the mixture
     X = np.dot(A, S)
     Y, W = picard(X, verbose=True)

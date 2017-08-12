@@ -2,9 +2,9 @@
 from setuptools import find_packages
 from numpy.distutils.core import setup
 
-descr = """Maximum likelihood algorithms"""
+descr = """Maximum likelihood ICA algorithms"""
 
-DISTNAME = 'fasterica'
+DISTNAME = 'ml_ica'
 DESCRIPTION = descr
 MAINTAINER = 'Pierre Ablin'
 MAINTAINER_EMAIL = 'pierre.ablin@inria.fr'
