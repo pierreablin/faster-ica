@@ -12,8 +12,8 @@ from ml_ica.algorithms import (picard, simple_quasi_newton_ica, truncated_ica,
 '''
 Choose dataset
 '''
-# dataset = 'eeg'
-dataset = 'fmri'
+dataset = 'eeg'
+# dataset = 'fmri'
 
 '''
 Fetch dataset
