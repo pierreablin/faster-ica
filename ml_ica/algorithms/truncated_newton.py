@@ -9,6 +9,8 @@ Tillet, P. et al., "Infomax-ICA using Hessian-free optimization"
 #          Jean-Francois Cardoso <cardoso@iap.fr>
 #
 # License: BSD (3-clause)
+
+
 from __future__ import print_function
 from time import time
 from itertools import product
@@ -17,8 +19,8 @@ import scipy.sparse as sparse
 from scipy import linalg
 import scipy.sparse.linalg as slinalg
 
-from ..tools import (loss, gradient, compute_h, regularize_h, solveh,
-                     hessian_free, score, score_der, linesearch)
+from ml_ica.tools import (loss, gradient, compute_h, regularize_h, solveh,
+                          hessian_free, score, score_der, linesearch)
 
 
 def full_hessian(Y, psidY):
@@ -120,6 +122,7 @@ def truncated_ica(X, tol=1e-7, max_iter=100, l_fact=2., cg_tol=1e-2,
 
     cg_max : float
         Maximum number of inner conjugate gradient iterations
+
     Returns
     -------
     Y : array, shape (N, T)
@@ -162,12 +165,12 @@ def truncated_ica(X, tol=1e-7, max_iter=100, l_fact=2., cg_tol=1e-2,
         # Compute the direction by conjugate gradient
         direction = conjugate_gradient(Y, psidY, h, -G, l_reg, cg_max, cg_tol)
         # Do a line search in that direction
-        success, Y_new, W_new, new_loss =\
+        success, Y_new, W_new, new_loss, _ =\
             linesearch(Y, W, direction, current_loss)
         # If it fails, fall back to gradient
         if not success:
             direction = - G
-            _, Y_new, W_new, new_loss =\
+            _, Y_new, W_new, new_loss, _ =\
                 linesearch(Y, W, direction, current_loss, 3)
         # Update
         Y = Y_new

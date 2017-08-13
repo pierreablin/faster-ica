@@ -10,7 +10,9 @@ from time import time
 
 import numpy as np
 from scipy import linalg
-import numexpr as ne
+
+from ml_ica.tools import (gradient, compute_h, regularize_h, solveh,
+                          score, score_der, linesearch)
 
 
 def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
@@ -80,12 +82,10 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
     for n in range(max_iter):
         timing = time() - t0
         # Compute the score function
-        psiY = ne.evaluate('tanh(Y / 2.)')
-        psidY = ne.evaluate('(- psiY ** 2 + 1.) / 2.')  # noqa
-        # XXX why don't you use score and score_der functions here?
+        psiY = score(Y)
+        psidY = score_der(psiY)
         # Compute the relative gradient
-        G = np.inner(psiY, Y) / float(T)
-        G.flat[::N + 1] -= 1  # remove 1 from diagonal
+        G = gradient(Y, psiY)
         # Stopping criterion
         gradient_norm = linalg.norm(G.ravel(), ord=np.inf)
         if gradient_norm < tol:
@@ -102,19 +102,19 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
                 r_list.pop(0)
         G_old = G # noqa
         # Compute the Hessian approximation and regularize
-        h = _hessian(Y, psidY, precon)
-        h = _regularize(h, lambda_min)
+        h = compute_h(Y, psidY, precon)
+        h = regularize_h(h, lambda_min)
         # Find the L-BFGS direction
         direction = _l_bfgs_direction(G, h, s_list, y_list, r_list,
                                       precon, lambda_min)
         # Do a line_search in that direction:
         converged, new_Y, new_W, new_loss, alpha =\
-            _line_search(Y, W, direction, current_loss, ls_tries, verbose)
+            linesearch(Y, W, direction, current_loss, ls_tries)
         if not converged:
             direction = -G
             s_list, y_list, r_list = [], [], []
             _, new_Y, new_W, new_loss, alpha =\
-                _line_search(Y, W, direction, current_loss, ls_tries, 0)
+                linesearch(Y, W, direction, current_loss, ls_tries)
         direction *= alpha
         Y = new_Y
         W = new_W
@@ -128,39 +128,6 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
     return Y, W
 
 
-def _loss(Y, W):
-    '''
-    Computes the loss function for Y, W
-    '''
-    T = Y.shape[1]
-    _, log_det = np.linalg.slogdet(W)
-    logcoshY = np.sum(ne.evaluate('abs(Y) + 2. * log1p(exp(-abs(Y)))'))
-    return - log_det + logcoshY / float(T)
-
-
-def _line_search(Y, W, direction, current_loss, ls_tries, verbose):
-    '''
-    Performs a backtracking line search, starting from Y and W, in the
-    direction direction. I
-    '''
-    N = Y.shape[0]
-    projected_W = np.dot(direction, W)
-    alpha = 1.
-    if current_loss is None:
-        current_loss = _loss(Y, W)
-    for _ in range(ls_tries):
-        Y_new = np.dot(np.eye(N) + alpha * direction, Y)
-        W_new = W + alpha * projected_W
-        new_loss = _loss(Y_new, W_new)
-        if new_loss < current_loss:
-            return True, Y_new, W_new, new_loss, alpha
-        alpha /= 2.
-    else:
-        if verbose == 2:
-            print('line search failed, falling back to gradient')
-        return False, Y_new, W_new, new_loss, alpha
-
-
 def _l_bfgs_direction(G, h, s_list, y_list, r_list, precon, lambda_min):
     q = G.copy()
     a_list = []
@@ -168,52 +135,11 @@ def _l_bfgs_direction(G, h, s_list, y_list, r_list, precon, lambda_min):
         alpha = r * np.sum(s * q)
         a_list.append(alpha)
         q -= alpha * y
-    z = _solve_hessian(q, h)
+    z = solveh(q, h)
     for s, y, r, alpha in zip(s_list, y_list, r_list, reversed(a_list)):
         beta = r * np.sum(y * z)
         z += (alpha - beta) * s
     return -z
-
-
-def _hessian(Y, psidY, precon):
-    '''
-    Computes the Hessian approximation
-    '''
-    T = Y.shape[1]
-    # Build the diagonal of the Hessian, a.
-    Y_squared = Y ** 2
-    if precon == 2:
-        h = np.inner(psidY, Y_squared) / float(T)
-    elif precon == 1:
-        sigma2 = np.mean(Y_squared, axis=1)
-        psidY_mean = np.mean(psidY, axis=1)
-        h = psidY_mean[:, None] * sigma2[None, :]
-        diagonal_term = np.mean(Y_squared * psidY) + 1.
-        h[np.diag_indices_from(h)] = diagonal_term
-    else:
-        raise ValueError('precon should be 1 or 2')
-    return h
-
-
-def _regularize(h, lambda_min):
-    '''
-    Regularizes h with the level lambda_min
-    '''
-    # Compute the eigenvalues of the Hessian
-    eigenvalues = 0.5 * (h + h.T - np.sqrt((h - h.T) ** 2 + 4.))
-    # Regularize
-    problematic_locs = eigenvalues < lambda_min
-    np.fill_diagonal(problematic_locs, False)
-    i_pb, j_pb = np.where(problematic_locs)
-    h[i_pb, j_pb] += lambda_min - eigenvalues[i_pb, j_pb]
-    return h
-
-
-def _solve_hessian(G, h):
-    '''
-    Returns the solution of hX = G
-    '''
-    return (G * h.T - G.T) / (h * h.T - 1.)
 
 
 if __name__ == '__main__':

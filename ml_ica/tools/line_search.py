@@ -22,4 +22,4 @@ def linesearch(Y, W, direction, initial_loss=None, n_ls_tries=5):
         step /= 2.
     else:
         success = False
-    return success, new_Y, new_W, new_loss
+    return success, new_Y, new_W, new_loss, step

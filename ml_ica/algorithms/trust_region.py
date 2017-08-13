@@ -16,7 +16,7 @@ from time import time
 import numpy as np
 from scipy import linalg
 
-from ..tools import loss, gradient, compute_h, score, score_der
+from ml_ica.tools import loss, gradient, compute_h, score, score_der
 
 
 def invert_z(h, G):

@@ -40,7 +40,7 @@ def compute_h(Y, psidY, precon=2):
     '''
     N, T = Y.shape
     if precon == 2:
-        return np.inner(psidY, Y ** 2) / float(T) + np.eye(N)
+        return np.inner(psidY, Y ** 2) / float(T)
     else:
         Y_squared = Y ** 2
         sigma2 = np.mean(Y_squared, axis=1)
