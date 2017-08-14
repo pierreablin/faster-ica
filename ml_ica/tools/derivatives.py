@@ -46,7 +46,7 @@ def compute_h(Y, psidY, precon=2):
         sigma2 = np.mean(Y_squared, axis=1)
         psidY_mean = np.mean(psidY, axis=1)
         h1 = psidY_mean[:, None] * sigma2[None, :]
-        diagonal_term = np.mean(Y_squared * psidY) + 1.
+        diagonal_term = np.mean(Y_squared * psidY)
         h1[np.diag_indices_from(h1)] = diagonal_term
         return h1
 

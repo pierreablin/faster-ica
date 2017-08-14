@@ -2,7 +2,7 @@ import numpy as np
 from .derivatives import loss
 
 
-def linesearch(Y, W, direction, initial_loss=None, n_ls_tries=5):
+def linesearch(Y, W, direction, initial_loss=None, n_ls_tries=10):
     '''
     Performs a simple backtracking linesearch in the direction "direction".
     Does n_ls_tries attempts before exiting.

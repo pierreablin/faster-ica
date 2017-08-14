@@ -19,41 +19,6 @@ from scipy import linalg
 from ml_ica.tools import loss, gradient, compute_h, score, score_der
 
 
-def invert_z(h, G):
-    '''
-    Computation of h^-1 G, as the authors do.
-    '''
-    Tr = h + h.T
-    dt = h * h.T - 1.
-    Tr /= 2.
-    sq = np.sqrt(Tr ** 2 - dt)
-    lam1 = Tr - sq
-    lam2 = Tr + sq
-    ss = lam1 - h
-    norms = np.sqrt(1. + ss ** 2)
-    c1 = (G + ss * G.T) / np.abs(lam1)
-    c2 = (ss * G - G.T) / np.abs(lam2)
-    X = c1 - ss * c2
-    X /= norms
-    diag_ind = np.diag_indices_from(X)
-    X[diag_ind] = G[diag_ind] / (1. + h[diag_ind])
-    return X
-
-
-def inner(A, B):
-    '''
-    Frobenius matrix inner product
-    '''
-    return np.dot(A.ravel(), B.ravel())
-
-
-def norm(A):
-    '''
-    Frobenius matrix norm
-    '''
-    return np.sqrt(inner(A, A))
-
-
 def trust_region_ica(X, max_iter=200, tol=1e-7, lambda_min=0.01, verbose=0,
                      callback=None):
     '''
@@ -82,6 +47,9 @@ def trust_region_ica(X, max_iter=200, tol=1e-7, lambda_min=0.01, verbose=0,
 
     verbose : 0, 1 or 2
         Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    callback : None or function
+        Optional function run at each iteration on all the local variables.
 
     Returns
     -------
@@ -173,6 +141,41 @@ def trust_region_ica(X, max_iter=200, tol=1e-7, lambda_min=0.01, verbose=0,
             ending = '\r' if verbose == 1 else '\n'
             print(info, end=ending)
     return Y, W
+
+
+def invert_z(h, G):
+    '''
+    Computation of h^-1 G, as the authors do.
+    '''
+    Tr = h + h.T
+    dt = h * h.T - 1.
+    Tr /= 2.
+    sq = np.sqrt(Tr ** 2 - dt)
+    lam1 = Tr - sq
+    lam2 = Tr + sq
+    ss = lam1 - h
+    norms = np.sqrt(1. + ss ** 2)
+    c1 = (G + ss * G.T) / np.abs(lam1)
+    c2 = (ss * G - G.T) / np.abs(lam2)
+    X = c1 - ss * c2
+    X /= norms
+    diag_ind = np.diag_indices_from(X)
+    X[diag_ind] = G[diag_ind] / (1. + h[diag_ind])
+    return X
+
+
+def inner(A, B):
+    '''
+    Frobenius matrix inner product
+    '''
+    return np.dot(A.ravel(), B.ravel())
+
+
+def norm(A):
+    '''
+    Frobenius matrix norm
+    '''
+    return np.sqrt(inner(A, A))
 
 
 if __name__ == '__main__':

@@ -32,13 +32,14 @@ n_features, n_samples = X.shape
 '''
 Specify the tolerance and maximum number of iterations
 '''
+
 tol = 1e-7
 max_iter = 250
 
 '''
 Run each algorithm on the dataset and plot the gradient curves
 '''
-plt.figure()
+
 algorithm_list = [truncated_ica, trust_region_ica, simple_quasi_newton_ica,
                   picard]
 algorithm_names = ['Truncated Newton ICA', 'Trust region ICA',
@@ -50,18 +51,21 @@ Running ica on %s dataset of size %d x %d...
 
 ''' % (dataset, n_features, n_samples))
 
+plt.figure()
 for algorithm, name in zip(algorithm_list, algorithm_names):
-    cb = callback(['timing', 'gradient_norm'])
-    X_copy = X.copy()
-    print('Running  %s ...' % name)
-    algorithm(X_copy, verbose=1, callback=cb, tol=tol, max_iter=max_iter)
-    gradients = cb['gradient_norm']
-    times = cb['timing']
-    print('Took %.2g s / %d iterations to reach a gradient norm of %.2g.' %
-          (times[-1], len(times), max(gradients[-1], tol)))
-    print('Average time per iteration: %.2g sec' % (times[-1] / len(times)))
-    plt.semilogy(times, gradients, label=name)
-    print('')
+    if name != 'Trust region ICA':
+        cb = callback(['timing', 'gradient_norm'])
+        X_copy = X.copy()
+        print('Running  %s ...' % name)
+        algorithm(X_copy, verbose=1, callback=cb, tol=tol, max_iter=max_iter)
+        gradients = cb['gradient_norm']
+        times = cb['timing']
+        print('Took %.2g s / %d iterations to reach a gradient norm of %.2g.' %
+              (times[-1], len(times), max(gradients[-1], tol)))
+        print('Average time per iteration: %.2g sec' %
+              (times[-1] / len(times)))
+        plt.semilogy(times, gradients, label=name)
+        print('')
 
 plt.legend()
 plt.xlabel('Time (sec)')

@@ -15,7 +15,7 @@ from ml_ica.tools import (gradient, compute_h, regularize_h, solveh,
                           score, score_der, linesearch)
 
 
-def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
+def picard(X, max_iter=1000, tol=1e-7, mem_size=7, precon=2, lambda_min=0.01,
            ls_tries=10, verbose=0, callback=None):
     '''Runs Picard algorithm.
 
@@ -32,11 +32,15 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
         Matrix containing the signals that have to be unmixed. N is the
         number of signals, T is the number of samples. X has to be centered
 
-    m : int
-        Size of L-BFGS's memory. Typical values for m are in the range 3-15
-
     max_iter : int
         Maximal number of iterations for the algorithm
+
+    tol : float
+        tolerance for the stopping criterion. Iterations stop when the norm
+        of the gradient gets smaller than tol.
+
+    mem_size : int
+        Size of L-BFGS's memory. Typical values for m are in the range 3-15
 
     precon : 1 or 2
         Chooses which Hessian approximation is used as preconditioner.
@@ -44,10 +48,6 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
         2 -> H2
         H2 is more costly to compute but can greatly accelerate convergence
         (See the paper for details).
-
-    tol : float
-        tolerance for the stopping criterion. Iterations stop when the norm
-        of the gradient gets smaller than tol.
 
     lambda_min : float
         Constant used to regularize the Hessian approximations. The
@@ -61,6 +61,10 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
 
     verbose : 0, 1 or 2
         Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    callback : None or function
+        Optional function run at each iteration on all the local variables.
+
 
     Returns
     -------
@@ -96,7 +100,7 @@ def picard(X, m=7, max_iter=1000, precon=1, tol=1e-7, lambda_min=0.01,
             y = G - G_old  # noqa
             y_list.append(y)
             r_list.append(1. / np.dot(direction.ravel(), y.ravel()))  # noqa
-            if len(s_list) > m:
+            if len(s_list) > mem_size:
                 s_list.pop(0)
                 y_list.pop(0)
                 r_list.pop(0)

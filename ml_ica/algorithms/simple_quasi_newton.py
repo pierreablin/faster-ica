@@ -20,7 +20,8 @@ from ml_ica.tools import (loss, gradient, compute_h, regularize_h, solveh,
 
 
 def simple_quasi_newton_ica(X, max_iter=200, tol=1e-7, precon=2,
-                            lambda_min=0.01, verbose=0, callback=None):
+                            lambda_min=0.01, ls_tries=10, verbose=0,
+                            callback=None):
     '''
     Simple quasi-Newton algorithm.
     Highly inspired by:
@@ -52,8 +53,16 @@ def simple_quasi_newton_ica(X, max_iter=200, tol=1e-7, precon=2,
         eigenvalues of the approximation that are below lambda_min are
         shifted to lambda_min.
 
+    ls_tries : int
+        Number of tries allowed for the backtracking line-search. When that
+        number is exceeded, the direction is thrown away and the gradient
+        is used instead.
+
     verbose : 0, 1 or 2
         Verbose level. 0: No verbose. 1: One line verbose. 2: Detailed verbose
+
+    callback : None or function
+        Optional function run at each iteration on all the local variables.
 
     Returns
     -------
@@ -87,12 +96,12 @@ def simple_quasi_newton_ica(X, max_iter=200, tol=1e-7, precon=2,
         direction = - solveh(G, H)
         # Do a line_search in that direction
         success, new_Y, new_W, new_loss, _ =\
-            linesearch(Y, W, direction, current_loss)
+            linesearch(Y, W, direction, current_loss, ls_tries)
         # If the line search failed, fall back to the gradient
         if not success:
             direction = - G
             _, new_Y, new_W, new_loss, _ =\
-                linesearch(Y, W, direction, current_loss, 3)
+                linesearch(Y, W, direction, current_loss, ls_tries)
         # Update
         Y = new_Y
         W = new_W
